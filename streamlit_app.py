@@ -1,7 +1,9 @@
+
 import pickle
 import os
 import numpy as np
 import streamlit as st
+import pandas as pd
 from streamlit_option_menu import option_menu
 import datetime
 
@@ -9,7 +11,16 @@ import datetime
 st.set_page_config(page_title="Crop Recommendation System", layout="centered")
 
 # ---------------- LOAD MODEL ----------------
-model = pickle.load(open("crop_recommendation.sav", 'rb'))
+model = pickle.load(open("crop_recommendation1.sav", 'rb'))
+
+# ---------------- LABEL TO CROP NAME MAP ----------------
+label_to_crop = {
+    0: 'apple', 1: 'banana', 2: 'blackgram', 3: 'chickpea', 4: 'coconut',
+    5: 'coffee', 6: 'cotton', 7: 'grapes', 8: 'jute', 9: 'kidneybeans',
+    10: 'lentil', 11: 'maize', 12: 'mango', 13: 'mothbeans', 14: 'mungbean',
+    15: 'muskmelon', 16: 'orange', 17: 'papaya', 18: 'pigeonpeas',
+    19: 'pomegranate', 20: 'rice', 21: 'watermelon'
+}
 
 # ---------------- VISITOR COUNTER ----------------
 counter_file = "visitor_data.pkl"
@@ -37,7 +48,7 @@ with st.sidebar:
 # ---------------- WELCOME PAGE ----------------
 if selected == "Welcome":
     st.markdown("<h1 style='text-align: center; color: green;'>🌿 Crop Recommendation System</h1>", unsafe_allow_html=True)
-    st.success(f"🚜 **Total Visitors:** {visitor_data['count']}")
+    st.success(f"🚜 *Total Visitors:* {visitor_data['count']}")
     st.write("""
     This intelligent tool helps farmers and agricultural experts recommend the most suitable crop to grow based on soil and climate parameters.
 
@@ -66,8 +77,11 @@ elif selected == "Prediction":
 
     if submit:
         input_data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
-        prediction = model.predict(input_data)[0]
-        st.success(f"🌱 **Recommended Crop to Grow:** `{prediction.capitalize()}`")
+        prediction_raw = model.predict(input_data)[0]
+
+        # Handle numerical predictions
+        prediction = label_to_crop.get(prediction_raw, prediction_raw)  # fallback if already string
+        st.success(f"🌱 *Recommended Crop to Grow:* {prediction.capitalize()}")
 
 # ---------------- FAQ PAGE ----------------
 elif selected == "FAQ":
@@ -76,27 +90,27 @@ elif selected == "FAQ":
     with st.expander("📌 What does this app do?"):
         st.write("It recommends the best crop to grow based on soil nutrients and environmental factors using machine learning.")
 
-    with st.expander("📌 How accurate is the model?"):
-        st.write("The model was trained on a labeled dataset with high accuracy, but real-world decisions should also consider local factors.")
+    with st.expander("📌 How was the model trained?"):
+        st.write("Using a dataset with labeled crop data, various ML models were tested, and Random Forest was selected based on accuracy.")
 
-    with st.expander("📌 Can this tool work offline?"):
-        st.write("Yes. Once deployed, the app can function locally without internet, making it ideal for remote agricultural settings.")
-
-    with st.expander("📌 What if I input extreme or unrealistic values?"):
-        st.write("The model may still predict, but accuracy is highest when real-world data ranges are followed.")
+    with st.expander("📌 What if I input unusual values?"):
+        st.write("The model will still predict, but predictions are most accurate with realistic, field-based values.")
 
     with st.expander("📌 What crops are included?"):
-        st.write("Some of the crops include rice, maize, lentil, banana, coconut, cotton, ground nut, mango, apple, and more.")
+        st.write("Crops like rice, maize, lentil, banana, coconut, cotton, ground nut, mango, apple, and many more are covered.")
 
-    with st.expander("📌 How was the model created?"):
-        st.write("We used supervised learning algorithms and selected the best performer (Random Forest) after comparison with others.")
+    with st.expander("📌 Can this tool work offline?"):
+        st.write("Yes. Once deployed locally, it can work without an internet connection.")
 
-    with st.expander("📌 Can this be extended for fertilizer recommendation?"):
-        st.write("Yes, similar models can be built to recommend fertilizer types and dosages based on soil test inputs.")
+    with st.expander("📌 Can I use this app for other regions?"):
+        st.write("Yes, but performance will depend on how similar local conditions are to those in the training data.")
+
+    with st.expander("📌 Can I use this for fertilizer recommendation?"):
+        st.write("This app focuses on crop prediction, but similar models can be trained for fertilizer recommendation as well.")
 
 # ---------------- DISCLAIMER PAGE ----------------
 elif selected == "Disclaimer":
-    st.markdown("<h2 style='text-align: center;'>⚠️ Disclaimer</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>⚠ Disclaimer</h2>", unsafe_allow_html=True)
     st.warning("""
     - This app is meant to aid agricultural decision-making.
     - It does not replace field trials or expert agronomist advice.
@@ -107,7 +121,7 @@ elif selected == "Disclaimer":
 elif selected == "Analytics":
     st.markdown("<h2 style='text-align: center;'>📊 Visitor Analytics</h2>", unsafe_allow_html=True)
 
-    st.info(f"👥 **Total Visitors:** {visitor_data['count']}")
+    st.info(f"👥 *Total Visitors:* {visitor_data['count']}")
 
     if visitor_data['timestamps']:
         st.write("### 🕒 Visitor Log")
@@ -126,11 +140,11 @@ elif selected == "Donate & Support":
     st.write("""
     If this tool has helped you and you'd like to support its further development, please consider donating 🙏
 
-    - **PayPal:** dataquestsolutions2@gmail.com  
-    - **Buy Me a Coffee (M-Pesa):** +254701344230  
-    - **M-Pesa Paybill (Kenya):**  
-        - **Paybill:** 522522  
-        - **Account Number:** 1340849054  
+    - *PayPal:* dataquestsolutions2@gmail.com  
+    - *Buy Me a Coffee (M-Pesa):* +254701344230  
+    - *M-Pesa Paybill (Kenya):*  
+        - *Paybill:* 522522  
+        - *Account Number:* 1340849054  
 
     Every contribution fuels innovation in smart agriculture 💚
     """)

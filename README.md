@@ -100,9 +100,9 @@ If this project has helped you, consider supporting it 🙏
 ## 🧑‍💻 Developed By
 
 **Enoch Bereka**  
-Email: [dataquestsolutions2@gmail.com](mailto:dataquestsolutions2@gmail.com)  
+Email: [dataquestsolutions2@gmail.com](dataquestsolutions2@gmail.com)  
 Location: Kakamega, Kenya  
-Organization: [Health Data Hub](https://github.com/your-org)
+Organization: [DataQuest Solutions]([https://github.com/your-org](https://my-project-git-main-enocks-projects-27f604c8.vercel.app))
 
 ---
 
